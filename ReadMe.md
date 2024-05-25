@@ -70,6 +70,12 @@ To install PeerPack, follow these steps:
    peerpack uninstall <package_name>
    ```
 
+5. Check package version:
+
+  ```bash
+  peerpack version <package_name>
+  ```
+
    For more information and detailed usage instructions, refer to the PeerPack Documentation.
 
 ## Contributing
