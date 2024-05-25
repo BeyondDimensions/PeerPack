@@ -13,7 +13,7 @@ setup(
         # List your dependencies here
     ],
     author='Peer Pack',
-    author_email='peer.pack@example.com',
+    author_email='info@peerpack.io',
     description='Decentralized package manager for Python',
     url='https://github.com/BeyondDimensions/PeerPack',
     license='MIT',

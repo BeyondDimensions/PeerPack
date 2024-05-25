@@ -19,7 +19,7 @@ To install PeerPack, follow these steps:
 1. Clone the PeerPack repository to your local machine:
 
    ```bash
-   git clone https://github.com/peerpack/peerpack.git
+   git clone https://github.com/BeyondDimensions/PeerPack
    ```
 
 2. Navigate to the PeerPack directory:
@@ -83,7 +83,7 @@ To install PeerPack, follow these steps:
    Please ensure your code follows the project's coding standards and includes appropriate documentation.
 
 ## License
-   PeerPack is licensed under the MIT License. See the LICENSE file for details.
+   PeerPack is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Contact
    If you have any questions, issues, or feedback about PeerPack, feel free to reach out to us at info@peerpack.io.
