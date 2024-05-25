@@ -8,16 +8,16 @@ def main():
 
     # Command to list the available packages
     list_parser = subparsers.add_parser('list', help='Lists the available packages')
-    list_parser.add_argument('repository.package', type=str, help='Name of the repository to list the packages from')
+    list_parser.add_argument('repository_package', type=str, help='Name of the repository to list the packages from (Format: repository.package)')
 
     # Command to install the latest version
     install_parser = subparser.add_parser('install', help='Installs the package')
-    install_parser.add_argument('repository.package', type=str, help='Name of the package to install')
+    install_parser.add_argument('repository_package', type=str, help='Name of the package to install (Format: repository.package)')
     install_parser.add_argument('--version', type=str, help='Version of the package')
 
     # Command to update the packege
     update_parser = subparser.add_parser('update', help='Updates the package')
-    update_parser.add_argument ('repository.package', type=str, help='Name of the package to update')
+    update_parser.add_argument ('repository_package', type=str, help='Name of the package to update (Format: repository.package)')
 
     # Command to unisntall the packages
     uninstall_parser = subparser.add_parser('update', help='Uninstalls the package')
@@ -29,32 +29,44 @@ def main():
 
     # Command to register a package
     register_parser = subparser.add_parser('register', help='Registers a package')
-    register_parser.add_argument ('repository.package', type=str, help='Name of the package to register')
+    register_parser.add_argument ('repository_package', type=str, help='Name of the package to register (Format: repository.package)')
     register_parser.add_argument ('--version', type=str, required=True, help='Version of the package being registered')
     register_parser.add_argument ('--description', type=str, help='Description of the package')
 
     # Command to release/publish a package
-    release_parser = subparser.add_parser('repository.release', help='Push the registered package to a repository')
-    release_parser.add_argument ('repository.package', type=str, help='Name of the package to release')
+    release_parser = subparser.add_parser('release', help='Push the registered package to a repository')
+    release_parser.add_argument ('repository_package', type=str, help='Name of the package to release (Format: repository.package)')
     release_parser.add_argument ('--version', type=str, required=True, help='Version of the package being released')
     release_parser.add_argument ('--file', type=str, required=True, help='Path to the file')
 
     args = parser.parse_args()
 
     if args.command == 'list':
-        manager.list_packages()
+        repo, package = args.repository_package.split('.')
+        manager.list_package(package, repo)
 
     elif args.command == 'install':
-        manager.install_package(args.package, args.version)
+        repo, package = args.repository_package.split('.')
+        manager.install_package(package, args.version, repo)
 
     elif args.command == 'update':
-        manager.update_package(args.update)
+        repo, package = args.repository_package.split('.')
+        manager.update_package(package, repo)
 
     elif args.command == 'uninstall':
         manager.update_package(args.uninstall)
 
     elif args.command == 'version':
         manager.update_package(args.version)
+
+    elif args.command == 'register':
+        repo, package = args.repository_package.split('.')
+        manager.register_package(package, args.version, repo, args.description)
+
+    elif args.command == 'upload':
+        repo, package = args.repository_package.split('.')
+        manager.upload_package(package, args.version, args.file, repo)
+
 
 if __name__ == "__main__":
     main()
