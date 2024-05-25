@@ -3,46 +3,76 @@ from dependency_resolver import resolve
 from package_index.pkg_repo import PackageRepo
 from native_installer import install_package, uninstall_package, get_installed_packages
 
-class InstallationManagement:
-    def __init__(self, repository_name):
-        self.repository = PackageRepo(repository_name)
-
-def install(repository_name: str, package_name: str, version: str | None):
-    logger.info(f"Installing package {package_name}")
-    dependencies = resolver.resolve(package_name)
-    for dep in dependencies:
-        logger.debug(f"Installing dependency {dep}")
-        installer.install(dep)
+def install(repository_name: str, package_name: str, version: str | None = None):
     try:
-        logger.debug(f"Starting installation of {package_name}")
-        path = self.repository.download_package(package_name, version)
-        install_package(path)
-        logger.info(f"Successfully installed package {package_name}")
+        logger.info(f"Attempting to resolve dependencies for {package_name}")
+
+        repository = PackageRepo(repository_name)
+        # Resolve dependencies
+        dependencies = resolve_dependencies(repository, package_name)
+
+        # Retrieve installed packages to avoid reinstallation
+        installed_packages = get_installed_packages()
+
+        # Install all dependencies first
+        for dep in dependencies:
+            if dep not in installed_packages:
+                logger.debug(f"Installing dependency {dep}")
+                package_path = repository.download_package(dep)
+                install_package(package_path)
+                logger.info(f"Successfully installed dependency {dep}")
+
+        # Now install the main package if it's not already installed
+        if package_name not in installed_packages:
+            logger.info(f"Installing main package {package_name}")
+            package_path = repository.download_package(package_name, version)
+            install_package(package_path)
+            logger.info(f"Successfully installed package {package_name}")
+
     except Exception as e:
-        logger.exception(f"An error occurred while installing package {package_name}: {e}")
-
-def uninstall(package_name):
-    # Logic to install the given package
-    pass
-
-def update(package_name):
-    logger.info(f"Updating package {package_name}")
-    # Logic to update the package: uninstall and then install the new version
-    self.uninstaller.uninstall(package_name)
-    self.installer.install(package_name)
-    logger.info(f"Successfully updated package {package_name}")
+        logger.exception(f"An error occurred while installing {package_name}: {e}")
 
 
-def install(package, version=None):
-    installer = PackageInstaller(package_storage)
-    resolver = DependencyResolver(package_index)
-    dependencies = resolver.resolve(package_name)
-    for dep in dependencies:
-        logger.debug(f"Installing dependency {dep}")
-        installer.install(dep)
-def uninstall (package):
-    uninstaller = PackageUninstaller(package_storage)
-    uninstaller.uninstall(package_name)
-def update(package):
-    updater = PackageUpdater(package_storage)
-    updater.update(package_name)
+def uninstall(repository_name: str, package_name: str):
+    try:
+        logger.info(f"Attempting to uninstall {package_name}")
+
+        repository = PackageRepo(repository_name)
+        installed_packages = get_installed_packages()
+
+        if package_name in installed_packages:
+            uninstall_package(package_name)
+            logger.info(f"Successfully uninstalled {package_name}")
+        else:
+            logger.warning(f"Package {package_name} is not installed.")
+
+    except Exception as e:
+        logger.exception(f"An error occurred while uninstalling {package_name}: {e}")
+
+
+def update(repository_name: str, package_name: str):
+    try:
+        logger.info(f"Checking for updates for {package_name}")
+        repository = PackageRepo(repository_name)
+        installed_packages = get_installed_packages()
+
+        if package_name not in installed_packages:
+            logger.warning(f"Package {package_name} is not installed. Consider installing it first.")
+            return
+
+        current_version = installed_packages[package_name]  # Assuming the version is stored
+        latest_version = repository.get_package_versions(package_name)
+
+        if current_version < latest_version:
+            logger.info(f"Updating {package_name} from version {current_version} to {latest_version}")
+            # Download the package first to ensure it's available before uninstalling
+            package_path = repository.download_package(package_name, latest_version)
+            # Use existing uninstall and install functions
+            uninstall(repository_name, package_name)  # Reuse the existing uninstall functionality
+            install(repository_name, package_name, latest_version)  # Reuse the existing install functionality
+            logger.info(f"Successfully updated {package_name} to version {latest_version}")
+        else:
+            logger.info(f"No updates available for {package_name}. Current version: {current_version}")
+
+    except Exception as e:
+        logger.exception(f"An error occurred while updating {package_name}: {e}")
