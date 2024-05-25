@@ -25,10 +25,10 @@
             "package_name": "string"
           },
           {
-            "version": "string"
+            "min_version": "string"
           },
           {
-            "exact_version": "bool"
+            "max_version": "string"
           }
         ],
         "minItems": 2,

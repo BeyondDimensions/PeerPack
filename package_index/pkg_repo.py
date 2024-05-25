@@ -8,7 +8,7 @@ from .exceptions import (
     VersionNotFoundError, NoSuchPackageError
 )
 from utils.logger import logger
-from brenthy_tools_beta.utils import (bytes_to_string)
+from brenthy_tools_beta.utils import (bytes_to_string, string_to_bytes)
 from brenthy_tools_beta.version_utils import is_version_greater
 
 from jsonschema import validate
@@ -32,7 +32,7 @@ class PackageRepo:
     def __init__(self, repo_name: str):
         self.blockchain = wapi.Blockchain(f"PeerPack-{repo_name}")
 
-    def register_package(self, package_name, version: str) -> str:
+    def register_package(self, package_name) -> str:
         """Register a new package.
 
         Returns:
@@ -48,18 +48,19 @@ class PackageRepo:
             "package_name": package_name,
             "public_key": public_key
         }
-        self.blockchain.add_block(
+        block = self.blockchain.add_block(
             json.dumps(block_content).encode(),
             topics=[REGISTER_TOPIC, package_name]
         )
+        # print(self._read_registration_block(block))
 
-        return private_key
+        return (private_key)
 
     def release_package(
         self,
         package_name: str,
         version: str,
-        dependencies: list[tuple[str, str, bool]],
+        dependencies: list[tuple[str, str, str]],
         package_data: str,
         key: str
     ):
@@ -67,9 +68,10 @@ class PackageRepo:
         registration = self._get_package_registration(package_name)
         if not registration:
             raise NoSuchPackageError()
-        if not is_version_greater(version, self.get_package_versions(package_name[-1])):
+        versions = self.get_package_versions(package_name)
+        if versions and not is_version_greater(version, versions[-1]):
             raise VersionIsntGreaterError()
-        crypt = Crypt(private_key=key)
+        crypt = Crypt(private_key=(key))
         if (
                 crypt.get_public_key()
                 != registration["public_key"]
@@ -100,13 +102,13 @@ class PackageRepo:
         """
         registration_blocks = [
             block_id for block_id in self.blockchain.block_ids
-            if REGISTER_TOPIC in wapi.decode_short_id(block_id).topics
+            if REGISTER_TOPIC in wapi.decode_short_id(block_id)["topics"]
         ]
-
         package_names: list[str] = []
-        for block in registration_blocks:
+        for block_id in registration_blocks:
             try:
-                self._read_registration_block(block)
+                registration = self._read_registration_block(self.blockchain.get_block(block_id))
+                package_names.append(registration["package_name"])
             except Exception as error:
                 logger.warning(f"Found corrupt registration_block:\n{error}")
         return package_names
@@ -127,9 +129,8 @@ class PackageRepo:
         Returns:
             list[tuple[str, str, bool]]: the dependencies
                 str: package name
-                str: version
-                bool: whether this specific version is required, or newer
-                    versions can be used as well
+                str: minimum compatible version
+                str: maximum compatible version
         """
         release = self._get_package_release(package_name, version)
         return release["dependencies"]
@@ -170,8 +171,8 @@ class PackageRepo:
             raise NoSuchPackageError()
         releases = []
         for block_id in self.blockchain.block_ids:
-            if (RELEASE_TOPIC in wapi.decode_short_id(block_id).topics
-                    and package_name in wapi.decode_short_id(block_id).topics
+            if (RELEASE_TOPIC in wapi.decode_short_id(block_id)["topics"]
+                    and package_name in wapi.decode_short_id(block_id)["topics"]
                     ):
                 try:
                     release = self._read_release_block(
@@ -188,9 +189,10 @@ class PackageRepo:
 
     def _get_package_registration(self, package_name: str) -> dict | None:
         """Get the contents of the initial package registration block."""
+        logger.debug(f"checking package registration {package_name}")
         for block_id in self.blockchain.block_ids:
-            if (REGISTER_TOPIC in wapi.decode_short_id(block_id).topics
-                    and package_name in wapi.decode_short_id(block_id).topics
+            if (REGISTER_TOPIC in wapi.decode_short_id(block_id)["topics"]
+                    and package_name in wapi.decode_short_id(block_id)["topics"]
                     ):
                 try:
                     return self._read_registration_block(self.blockchain.get_block(block_id))
@@ -203,9 +205,14 @@ class PackageRepo:
         try:
             registration_data = json.loads(block.content.decode())
             validate(instance=registration_data, schema=REGISTRATION_SCHEMA)
-            assert registration_data["package_name"] in block.topics
-            assert REGISTER_TOPIC in block.topics
-        except:
+            if not registration_data["package_name"] in block.topics:
+                logger.warning("Package name not in topics.")
+                raise Exception
+            if not REGISTER_TOPIC in block.topics:
+                logger.warning("Registration topic not in topics")
+                raise Exception
+        except Exception as error:
+            logger.warning(error)
             raise InvalidBlockError()
         return registration_data
 
@@ -214,8 +221,12 @@ class PackageRepo:
         try:
             registration_data = json.loads(block.content.decode())
             validate(instance=registration_data, schema=RELEASE_SCHEMA)
-            assert registration_data["package_name"] in block.topics
-            assert RELEASE_TOPIC in block.topics
+            if not registration_data["package_name"] in block.topics:
+                logger.warning("Package naem not in topics")
+                raise Exception()
+            if not RELEASE_TOPIC in block.topics:
+                logger.warning("Release topic not in topics")
+                raise Exception()
         except:
             raise InvalidBlockError()
         return registration_data
