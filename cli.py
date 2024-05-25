@@ -1,13 +1,13 @@
 import argparse
-from peerpack import manager
+import peerpack_api
 
 def main():
-    parse = argparse.ArgumentParser(description='It is a CLI-Frontend for the decentralzised package manager Peer Pack')
+    parser = argparse.ArgumentParser(description='It is a CLI-Frontend for the decentralzised package peerpack_api Peer Pack')
 
     subparser = parser.add_subparsers(dest='command', required=True, help='Available commands')
 
     # Command to list the available packages
-    list_parser = subparsers.add_parser('list', help='Lists the available packages')
+    list_parser = subparser.add_parser('list', help='Lists the available packages')
     list_parser.add_argument('repository_package', type=str, help='Name of the repository to list the packages from (Format: repository.package)')
 
     # Command to install the latest version
@@ -20,11 +20,11 @@ def main():
     update_parser.add_argument ('repository_package', type=str, help='Name of the package to update (Format: repository.package)')
 
     # Command to unisntall the packages
-    uninstall_parser = subparser.add_parser('update', help='Uninstalls the package')
+    uninstall_parser = subparser.add_parser('uninstall', help='Uninstalls the package')
     uninstall_parser.add_argument ('package', type=str, help='Name of the package to uninstall')
 
     #Command to check the version of the package
-    version_parser = subparser.add_parser('update', help='Checks the version of the package')
+    version_parser = subparser.add_parser('version', help='Checks the version of the package')
     version_parser.add_argument ('package', type=str, help='Name of the package to check the version')
 
     # Command to register a package
@@ -43,30 +43,33 @@ def main():
 
     if args.command == 'list':
         repo, package = args.repository_package.split('.')
-        manager.list_package(package, repo)
+        peerpack_api.list_package(package, repo)
 
     elif args.command == 'install':
         repo, package = args.repository_package.split('.')
-        manager.install_package(package, args.version, repo)
+        peerpack_api.install_package(package, args.version, repo)
 
     elif args.command == 'update':
         repo, package = args.repository_package.split('.')
-        manager.update_package(package, repo)
+        peerpack_api.update_package(package, repo)
 
     elif args.command == 'uninstall':
-        manager.update_package(args.uninstall)
+        peerpack_api.update_package(args.uninstall)
 
     elif args.command == 'version':
-        manager.update_package(args.version)
+        peerpack_api.update_package(args.version)
 
     elif args.command == 'register':
         repo, package = args.repository_package.split('.')
-        manager.register_package(package, args.version, repo, args.description)
+        peerpack_api.register_package(package, args.version, repo, args.description)
 
     elif args.command == 'upload':
         repo, package = args.repository_package.split('.')
-        manager.upload_package(package, args.version, args.file, repo)
+        peerpack_api.upload_package(package, args.version, args.file, repo)
 
 
 if __name__ == "__main__":
+    main()
+else:
+    from tests import dummy_peerpack_api as peerpack_api
     main()
