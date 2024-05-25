@@ -1,3 +1,4 @@
+import sys
 from loguru import logger
 
 # Remove the default logger to avoid duplicate logs
