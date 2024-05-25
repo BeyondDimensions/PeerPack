@@ -14,12 +14,14 @@ import json
 import jsonschema
 from jsonschema import validate
 import tempfile
-
+import os
 
 # Load the package block data formats from a file
-with open('registration_schema.json', 'r') as schema_file:
+REG_SCH_PATH = os.path.join(os.path.dirname(__file__), 'registration_schema.json')
+REL_SCH_PATH = os.path.join(os.path.dirname(__file__), 'release_schema.json')
+with open(REG_SCH_PATH, 'r') as schema_file:
     REGISTRATION_SCHEMA = json.load(schema_file)
-with open('release_schema.json', 'r') as schema_file:
+with open(REL_SCH_PATH, 'r') as schema_file:
     REGISTRATION_SCHEMA = json.load(schema_file)
 
 REGISTER_TOPIC = "package_registration"
@@ -43,8 +45,8 @@ class PackageRepo:
         public_key = crypt.get_public_key()
 
         block_content = {
-            "package_name" = package_name,
-            "public_key" = public_key
+            "package_name": package_name,
+            "public_key": public_key
         }
         self.blockchain.add_block(
             json.dumps(block_content).encode(),
@@ -73,10 +75,10 @@ class PackageRepo:
             raise ReleaseKeyError()
 
         block_content = {
-            "package_name" = package_name,
+            "package_name": package_name,
             "version": version,
-            "public_key" = public_key,
-            "package_data" = ipfs_api.publish(package_data)
+            "public_key": public_key,
+            "package_data": ipfs_api.publish(package_data)
         }
 
         # sign data and append the signature
@@ -112,7 +114,7 @@ class PackageRepo:
         """
         return [
             release["version"]
-            for release self._get_package_releases(package_name)
+            for release in self._get_package_releases(package_name)
         ]
 
     def get_package_dependencies(
@@ -127,7 +129,7 @@ class PackageRepo:
                 bool: whether this specific version is required, or newer
                     versions can be used as well
         """
-        release = self._get_package_release(self, package_name: str, version: str)
+        release = self._get_package_release(self, package_name, version)
         return release["dependencies"]
 
     def download_package(self, package_name: str, version: str | None) -> str:
@@ -165,8 +167,8 @@ class PackageRepo:
         releases = []
         for block_id in self.blockchain.block_ids:
             if (RELEASE_TOPIC in wapi.decode_short_id(block_id).topics
-                    and package_name in wapi.decode_short_id(block_id).topics
-                ):
+                        and package_name in wapi.decode_short_id(block_id).topics
+                    ):
                 try:
                     releases.append(self._read_release_block(
                         self.blockchain.get_block(block_id)))
@@ -177,8 +179,8 @@ class PackageRepo:
         """Get the contents of the initial package registration block."""
         for block_id in self.blockchain.block_ids:
             if (REGISTER_TOPIC in wapi.decode_short_id(block_id).topics
-                    and package_name in wapi.decode_short_id(block_id).topics
-                ):
+                        and package_name in wapi.decode_short_id(block_id).topics
+                    ):
                 try:
                     return self._read_registration_block(self.blockchain.get_block(block_id))
                 except Exception as error:
