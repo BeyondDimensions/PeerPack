@@ -53,24 +53,24 @@ To install PeerPack, follow these steps:
 
 ### Users
 
-2. Install packages from the PeerPack network:
+1. Install packages from the PeerPack network:
 
    ```bash
    peerpack install <package_name>
    ```
-3. Update installed packages:
+2. Update installed packages:
 
    ```bash
    peerpack update <package_name>
    ```
 
-4. Uninstall packages:
+3. Uninstall packages:
 
    ```bash
    peerpack uninstall <package_name>
    ```
 
-5. Check package version:
+4. Check package version:
 
   ```bash
   peerpack version <package_name>
