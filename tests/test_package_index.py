@@ -12,3 +12,18 @@ package_repo: PackageRepo
 
 def test_create_repo():
     global package_repo
+    create_repo(REPO_NAME)
+    package_repo = PackageRepo(REPO_NAME)
+
+
+def test_delete_repo():
+    package_repo.delete()
+
+
+def run_tests():
+    test_create_repo()
+    test_delete_repo()
+
+
+if __name__ == "__main__":
+    run_tests()
