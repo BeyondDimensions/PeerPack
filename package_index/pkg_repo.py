@@ -228,4 +228,5 @@ class PackageRepo:
 
     def delete(self):
         self.blockchain.delete()
+        self.blockchain.terminate()
         self.blockchain = None
