@@ -6,7 +6,7 @@ from .exceptions import (
     PackageExistsError, NoSuchPackageError, InvalidBlockError,
     VersionIsntGreaterError
 )
-import loguru
+from utils.logger import logger
 from brenthy_tools_beta.utils import (bytes_to_string, string_to_bytes)
 from brenthy_tools_beta.version_utils import is_version_greater
 
@@ -27,7 +27,7 @@ RELEASE_TOPIC = "package_release"
 
 
 class PackageRepo:
-    def __init__(self, repo_name):
+    def __init__(self, repo_name: str):
         self.blockchain = wapi.Blockchain(f"PeerPack-{repo_name}")
 
     def register_package(self, package_name, version: str) -> str:
@@ -53,7 +53,14 @@ class PackageRepo:
 
         return private_key
 
-    def release_package(self, package_name: str, version: str, package_data: str, key: str):
+    def release_package(
+        self,
+        package_name: str,
+        version: str,
+        dependencies: list[tuple[str, str, bool]],
+        package_data: str,
+        key: str
+    ):
         """Publish a new version of a package."""
         if not is_version_greater(version, self.get_package_versions(package_name[-1])):
             raise VersionIsntGreaterError()
@@ -82,7 +89,11 @@ class PackageRepo:
         )
 
     def list_packages(self) -> list[str]:
-        """Get a list of the available packages."""
+        """Get a list of the available packages.
+
+        Returns:
+            list[str]: a list of package names
+        """
         registration_blocks = [
             block_id for block_id in self.blockchain.block_ids
             if REGISTER_TOPIC in wapi.decode_short_id(block_id).topics
@@ -97,23 +108,43 @@ class PackageRepo:
         return package_names
 
     def get_package_versions(self, package_name: str) -> list[str]:
+        """Get the available versions of the specified packaged
+        """
         return [
             release["version"]
             for release self._get_package_releases(package_name)
         ]
 
+    def get_package_dependencies(
+        self, package_name: str, version: str
+    ) -> list[tuple[str, str, bool]]:
+        """Get the dependencies of the specified version of the package.
+
+        Returns:
+            list[tuple[str, str, bool]]: the dependencies
+                str: package name
+                str: version
+                bool: whether this specific version is required, or newer
+                    versions can be used as well
+        """
+        release = self._get_package_release(self, package_name: str, version: str)
+        return release["dependencies"]
+
     def download_package(self, package_name: str, version: str | None) -> str:
         """Download a specific version of a package.
 
         Returns:
-        str: the download location
+            str: the download location of the installable package data
         """
         if not version:
             release = self._get_package_releases(package_name)[-1]
         else:
             release = self._get_package_release(package_name, version)
 
-            ipfs_api.download()
+        tempdir = tempfile.mkdtemp()
+        download_path = os.path.join(tempdir, package_name)
+        ipfs_api.download(release["ipfs_cid"])
+        return download_path
 
     def _get_package_release(self, package_name: str, version: str) -> dict:
         """Get the release metadata of this version of the package."""
@@ -134,7 +165,7 @@ class PackageRepo:
         releases = []
         for block_id in self.blockchain.block_ids:
             if (RELEASE_TOPIC in wapi.decode_short_id(block_id).topics
-                and package_name in wapi.decode_short_id(block_id).topics
+                    and package_name in wapi.decode_short_id(block_id).topics
                 ):
                 try:
                     releases.append(self._read_release_block(
@@ -146,7 +177,7 @@ class PackageRepo:
         """Get the contents of the initial package registration block."""
         for block_id in self.blockchain.block_ids:
             if (REGISTER_TOPIC in wapi.decode_short_id(block_id).topics
-                and package_name in wapi.decode_short_id(block_id).topics
+                    and package_name in wapi.decode_short_id(block_id).topics
                 ):
                 try:
                     return self._read_registration_block(self.blockchain.get_block(block_id))

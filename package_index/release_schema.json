@@ -15,6 +15,26 @@
       "type":"string",
       "description": "The IPFS content ID of the installable package data."
     },
+    "dependencies": {
+      "type": "array",
+      "description": "A list of prerequisite packages and their versions.",
+      "items": {
+        "type": "array",
+        "items": [
+          {
+            "package_name": "string"
+          },
+          {
+            "version": "string"
+          },
+          {
+            "exact_version": "bool"
+          }
+        ],
+        "minItems": 2,
+        "maxItems": 2
+      }
+    },
     "signature": {
       "type": "string",
       "description": "The public key for authenticating package updates."
