@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SimplePackageSchema",
+  "type": "object",
+  "properties": {
+    "package_name": {
+      "type": "string",
+      "description": "The name of the package."
+    },
+    "version": {
+      "type": "string",
+      "description": "The version of this release of the package."
+    },
+    "ipfs_cid":{
+      "type":"string",
+      "description": "The IPFS content ID of the installable package data."
+    },
+    "signature": {
+      "type": "string",
+      "description": "The public key for authenticating package updates."
+    }
+  },
+  "required": ["package_name", "public_key"],
+  "additionalProperties": false
+}
