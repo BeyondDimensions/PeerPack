@@ -13,6 +13,7 @@ from brenthy_tools_beta.version_utils import is_version_greater
 import json
 import jsonschema
 from jsonschema import validate
+import tempfile
 
 
 # Load the package block data formats from a file
@@ -101,13 +102,39 @@ class PackageRepo:
             for release self._get_package_releases(package_name)
         ]
 
+    def download_package(self, package_name: str, version: str | None) -> str:
+        """Download a specific version of a package.
+
+        Returns:
+        str: the download location
+        """
+        if not version:
+            release = self._get_package_releases(package_name)[-1]
+        else:
+            release = self._get_package_release(package_name, version)
+
+            ipfs_api.download()
+
+    def _get_package_release(self, package_name: str, version: str) -> dict:
+        """Get the release metadata of this version of the package."""
+        # search for the desired release
+        release = [
+            release for release in self._get_package_releases(package_name)
+            if release["version"] == version
+        ]
+        if not release:
+            raise VersionNotFoundError()
+        if len(releases) > 1:
+            raise NotSupposedToHappenError()
+        return release[0]
+
     def _get_package_releases(self, package_name: str) -> list[dict]:
         """Get the available package versions for a given package"""
         package_registration = self._get_package_registration(package_name)
         releases = []
         for block_id in self.blockchain.block_ids:
             if (RELEASE_TOPIC in wapi.decode_short_id(block_id).topics
-                    and package_name in wapi.decode_short_id(block_id).topics
+                and package_name in wapi.decode_short_id(block_id).topics
                 ):
                 try:
                     releases.append(self._read_release_block(
@@ -115,19 +142,11 @@ class PackageRepo:
                 except Exception as error:
                     loguru.warning(error)
 
-    def download_package(self, package_name: str, version: str) -> str:
-        """Download a specific version of a package.
-
-        Returns:
-            str: the download location
-        """
-        pass
-
     def _get_package_registration(self, package_name: str) -> dict | None:
         """Get the contents of the initial package registration block."""
         for block_id in self.blockchain.block_ids:
             if (REGISTER_TOPIC in wapi.decode_short_id(block_id).topics
-                    and package_name in wapi.decode_short_id(block_id).topics
+                and package_name in wapi.decode_short_id(block_id).topics
                 ):
                 try:
                     return self._read_registration_block(self.blockchain.get_block(block_id))

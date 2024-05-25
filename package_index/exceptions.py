@@ -16,3 +16,11 @@ class ReleaseKeyError(Exception):
 
 class VersionIsntGreaterError(Exception):
     """When a provided package version is too low."""
+
+
+class VersionNotFoundError(Exception):
+    """When the provided version couldn't be found for the specified package."""
+
+
+class NotSupposedToHappenError(Exception):
+    """Indicate bugs."""
