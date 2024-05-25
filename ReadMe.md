@@ -1,4 +1,7 @@
+![PeerPack logo](assets/peerpack-logo-horizontal-framed.svg)
+
 # PeerPack
+*A resilient package manager for Atom*
 
 PeerPack is a decentralized package manager designed to simplify the distribution, installation, and management of [python/pulsar???] packages in decentralized network. It allows developers to register and release a package update. For users it allows to resolve dependencies, install, update, and uninstall packages easily, without relying on a centralized repository.
 
@@ -53,28 +56,22 @@ To install PeerPack, follow these steps:
 
 ### Users
 
-1. Install packages from the PeerPack network:
+2. Install packages from the PeerPack network:
 
    ```bash
    peerpack install <package_name>
    ```
-2. Update installed packages:
+3. Update installed packages:
 
    ```bash
    peerpack update <package_name>
    ```
 
-3. Uninstall packages:
+4. Uninstall packages:
 
    ```bash
    peerpack uninstall <package_name>
    ```
-
-4. Check package version:
-
-  ```bash
-  peerpack version <package_name>
-  ```
 
    For more information and detailed usage instructions, refer to the PeerPack Documentation.
 
