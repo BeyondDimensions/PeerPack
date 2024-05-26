@@ -24,9 +24,9 @@ def uninstall_package(package_name: str):
         return None, str(e), e.returncode
     pass
 
-def get_installed_packages():
+def get_installed_packages(package_name: str):
     try:
-        result = subprocess.run('ppm view package_name', shell = True, capture_output = True, text = True)
+        result = subprocess.run(f'ppm view {package_name}', shell = True, capture_output = True, text = True)
         output = result.stdout.strip()
         error_out = result.stderr.strip()
         return output, error_out, result.returncode
@@ -38,4 +38,4 @@ def get_installed_packages():
 if __name__ == "__main__":
 
     print(f"Output:\n{output}")
-    print(f"Error:\n{error_out}")
+    print(f"{error_out}")

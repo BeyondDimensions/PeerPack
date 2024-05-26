@@ -16,4 +16,4 @@ def install_package(download_path: str):
 if __name__ == "__main__":
     output, error_out, returncode = install_package(download_path)
     print(f"Output:\n{output}")
-    print(f"Error:\n{error_out}")
+    print(f"{error_out}")
