@@ -1,4 +1,5 @@
-def install_package(path: str):
+def install_package(download_path: str):
+        pulsar_package = subprocess.run('ppm install download_path', shell = True, capture_output = True, text = True)
     # if(!success) raise Exception("Something went wrong with the installation.")
     pass
 
