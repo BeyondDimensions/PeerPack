@@ -1,6 +1,9 @@
-# PeerPack
+![PeerPack logo](assets/peerpack-logo-horizontal-framed.svg)
 
-PeerPack is a decentralized package manager designed to simplify the distribution, installation, and management of [python/pulsar???] packages in decentralized network. It allows developers to register and release a package update. For users it allows to resolve dependencies, install, update, and uninstall packages easily, without relying on a centralized repository.
+# PeerPack
+*A resilient package manager for Atom*
+
+PeerPack is a decentralized package manager designed to simplify the distribution, installation, and management of pulsar packages in decentralized network. It allows developers to register and release a package update. For users it allows to resolve dependencies, install, update, and uninstall packages easily, without relying on a centralized repository. The system is adaptable for other package-ecosystems such as python.
 
 ## Features
 
@@ -79,7 +82,8 @@ To install PeerPack, follow these steps:
   For more information and detailed usage instructions, refer to the PeerPack Documentation.
 
 ## Contributing
-   Contributions to PeerPack are welcome! If you'd like to contribute to the project, please follow these steps:
+
+Contributions to PeerPack are welcome! If you'd like to contribute to the project, please follow these steps:
 
 1. Fork the PeerPack repository.
 2. Create a new branch for your feature or bug fix.
