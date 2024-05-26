@@ -1,7 +1,7 @@
 from utils.logger import logger
-from dependency_resolver import resolve
+from .dependency_resolver import resolve_dependencies
 from package_index.pkg_repo import PackageRepo
-from native_installer import install_package, uninstall_package, get_installed_packages
+from .native_installer import install_package, uninstall_package, get_installed_packages
 
 def install(repository_name: str, package_name: str, version: str | None = None):
     try:
