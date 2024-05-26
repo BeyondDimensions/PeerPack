@@ -1,5 +1,10 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from utils.logger import logger
+
 def resolve_dependencies(repository, root_package):
-    logger.info(f"Resolving dependencies for {package_name}")
+    logger.info(f"Resolving dependencies for {root_package}")
     resolved = set()  # Set to keep track of resolved packages
     unresolved = set()  # Set to detect circular dependencies
     install_order = []  # List to maintain the correct installation order
@@ -11,7 +16,8 @@ def resolve_dependencies(repository, root_package):
             raise ValueError(f"Circular dependency detected: {package_name}")
 
         unresolved.add(package_name)
-        dependencies = repository.get_package_dependencies(package_name, version, min_version, max_version)
+        latest_version = repository.get_package_versions(package_name)[-1]
+        dependencies = repository.get_package_dependencies(package_name, latest_version)
 
         for dep in dependencies:
             resolve(dep)
