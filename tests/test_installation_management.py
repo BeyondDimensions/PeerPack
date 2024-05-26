@@ -11,6 +11,7 @@ import testing_utils
 import walytis_beta_api as wapi
 REPO_NAME = "test_repo"
 BLOCKCHAIN_NAME = f"PeerPack-{REPO_NAME}"
+package_name = "xyz"
 package_repo: PackageRepo
 
 #
@@ -33,25 +34,29 @@ def test_preparations():
         wapi.delete_blockchain(BLOCKCHAIN_NAME)
     global package_repo
     create_repo(REPO_NAME)
+    repo = PackageRepo(REPO_NAME)
+    pk = repo.register_package(package_name)
+    repo.release_package(package_name, "0.0.1", [], "./", pk)
+    mark(repo, "Released package.")
 
 
 def test_install():
     # Call the function
-    install(REPO_NAME, 'xyz')
+    install(REPO_NAME, package_name)
 
     # Check the outputs (here we simply print to verify, in a real test we would use assertions)
     print("Install test completed.")
 
 def test_uninstall():
     # Call the function
-    uninstall(REPO_NAME, 'xyz')
+    uninstall(REPO_NAME, package_name)
 
     # Check the outputs (here we simply print to verify, in a real test we would use assertions)
     print("Uninstall test completed.")
 
 def test_update():
     # Call the function
-    update(REPO_NAME, 'xyz')
+    update(REPO_NAME, package_name)
 
     # Check the outputs (here we simply print to verify, in a real test we would use assertions)
     print("Update test completed.")
