@@ -69,7 +69,7 @@ def main():
         peerpack_api.update_package(args.uninstall)
 
     elif args.command == 'version':
-        peerpack_api.update_package(args.version)
+        peerpack_api.get_package_version(args.version)
 
     elif args.command == 'register':
         repo, package = args.repository_package.split('.')

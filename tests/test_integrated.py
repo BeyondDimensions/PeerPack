@@ -47,6 +47,23 @@ def test_release_package():
     mark(package_repo.get_package_versions(PACKAGE_NAME) == [version], "Released package.")
 
 
+def test_get_version():
+    output = run_shell_command(
+        f"python3 cli.py version {REPO_NAME}.{PACKAGE_NAME}"
+    )[-1]
+    mark(output == "1.0.0")
+
+
+def test_install_package():
+    global private_key
+    version = "1.0.0"
+    run_shell_command(
+        f"python3 cli.py install {REPO_NAME}.{PACKAGE_NAME} --version {version}"
+    )
+
+    mark(package_repo.get_package_versions(PACKAGE_NAME) == [version], "Released package.")
+
+
 def test_delete_repo():
     package_repo.delete()
     mark(BLOCKCHAIN_NAME not in wapi.list_blockchain_names(), "Deleted repo.")
@@ -56,6 +73,8 @@ def run_tests():
     test_preparations()
     test_register_package()
     test_release_package()
+    test_get_version()
+    test_install_package()
     test_delete_repo()
 
 

@@ -1,4 +1,5 @@
 from package_index.pkg_repo import PackageRepo
+from installation_management import installation_management
 
 
 def list_packages():
@@ -6,19 +7,19 @@ def list_packages():
 
 
 def install_package(package, version=None, repository=None):
-    pass
+    installation_management.install(repository, package, version)
 
 
 def uninstall_package(package):
-    pass
+    installation_management.uninstall(package)
 
 
 def update_package(package):
-    pass
+    installation_management.uninstall(package)
 
 
-def version_package(package):
-    pass
+def get_package_version(package, repository=None):
+    PackageRepo(repository).get_package_versions(package)[-1]
 
 
 def register_package(package, repository, description=None):
