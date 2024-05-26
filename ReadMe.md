@@ -56,26 +56,23 @@ To install PeerPack, follow these steps:
 
 ### Users
 
-2. Install packages from the PeerPack network:
+1. Install packages from the PeerPack network:
 
    ```bash
    peerpack install <package_name> <optional_version>
    ```
-3. Update installed packages:
+2. Update installed packages:
 
    ```bash
    peerpack update <package_name>
    ```
 
-4. Uninstall packages:
+3. Uninstall packages:
 
    ```bash
    peerpack uninstall <package_name>
    ```
 
-<<<<<<< HEAD
-   For more information and detailed usage instructions, refer to the PeerPack Documentation.
-=======
 4. Check package version:
 
   ```bash
@@ -83,10 +80,10 @@ To install PeerPack, follow these steps:
   ```
 
   For more information and detailed usage instructions, refer to the PeerPack Documentation.
->>>>>>> master
 
 ## Contributing
-   Contributions to PeerPack are welcome! If you'd like to contribute to the project, please follow these steps:
+   
+Contributions to PeerPack are welcome! If you'd like to contribute to the project, please follow these steps:
 
 1. Fork the PeerPack repository.
 2. Create a new branch for your feature or bug fix.
