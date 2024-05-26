@@ -138,7 +138,7 @@ class PackageRepo:
         release = self._get_package_release(package_name, version)
         return release["dependencies"]
 
-    def download_package(self, package_name: str, version: str | None) -> str:
+    def download_package(self, package_name: str, version: str | None = None) -> str:
         """Download a specific version of a package.
 
         Returns:
@@ -151,7 +151,7 @@ class PackageRepo:
 
         tempdir = tempfile.mkdtemp()
         download_path = os.path.join(tempdir, package_name)
-        ipfs_api.download(release["ipfs_cid"])
+        ipfs_api.download(release["ipfs_cid"], download_path)
         return download_path
 
     def _get_package_release(self, package_name: str, version: str) -> dict:
@@ -175,7 +175,7 @@ class PackageRepo:
         releases = []
         for block_id in self.blockchain.block_ids:
             if (RELEASE_TOPIC in wapi.decode_short_id(block_id)["topics"]
-                    and package_name in wapi.decode_short_id(block_id)["topics"]
+                        and package_name in wapi.decode_short_id(block_id)["topics"]
                     ):
                 try:
                     release = self._read_release_block(self.blockchain.get_block(block_id))
@@ -194,7 +194,7 @@ class PackageRepo:
         logger.debug(f"checking package registration {package_name}")
         for block_id in self.blockchain.block_ids:
             if (REGISTER_TOPIC in wapi.decode_short_id(block_id)["topics"]
-                    and package_name in wapi.decode_short_id(block_id)["topics"]
+                        and package_name in wapi.decode_short_id(block_id)["topics"]
                     ):
                 try:
                     return self._read_registration_block(self.blockchain.get_block(block_id))

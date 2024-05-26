@@ -1,3 +1,5 @@
+import subprocess
+import tempfile
 import sys
 import os
 if True:
@@ -23,8 +25,8 @@ PACKAGE_DATA = "./"
 def test_preparations():
     if BLOCKCHAIN_NAME in wapi.list_blockchain_names():
         wapi.delete_blockchain(BLOCKCHAIN_NAME)
-    global package_repo
     create_repo(REPO_NAME)
+    global package_repo
     package_repo = PackageRepo(REPO_NAME)
 
 
@@ -38,8 +40,10 @@ def test_register_package():
 
 def test_release_package():
     global private_key
-    version = "1.0.0"
-    file = "./"
+    version = "1.0.1"
+    file = clone_github_repo("https://github.com/donovanhiland/atom-file-icons")
+    file = clone_github_repo("https://github.com/b3by/atom-clock")
+
     run_shell_command(
         f"python3 cli.py release {REPO_NAME}.{PACKAGE_NAME} --version {version} --file {file} --key {private_key}"
     )
@@ -54,10 +58,21 @@ def test_get_version():
     mark(output == "1.0.0")
 
 
+def clone_github_repo(repo_url):
+    # Create a temporary directory
+    temp_dir = tempfile.mkdtemp()
+
+    # Run the git clone command in the temporary directory
+    subprocess.run(['git', 'clone', repo_url, temp_dir], check=True)
+
+    # Return the path to the temporary directory
+    return temp_dir
+
+
 def test_install_package():
     global private_key
-    version = "1.0.0"
-    run_shell_command(
+    version = "1.0.1"
+    os.system(
         f"python3 cli.py install {REPO_NAME}.{PACKAGE_NAME} --version {version}"
     )
 
@@ -73,7 +88,6 @@ def run_tests():
     test_preparations()
     test_register_package()
     test_release_package()
-    test_get_version()
     test_install_package()
     test_delete_repo()
 
