@@ -1,39 +1,39 @@
 def list_packages():
-    # Hier die Logik zum Auflisten der Pakete implementieren
-    print("Liste der Pakete:")
+    # listeing packages
+    print("List of packages:")
 
 def install_package(package, version=None, repository=None):
     if version and repository:
-        message=(f"Installiere Paket: {package}, Version: {version}, aus Repository: {repository}")
+        message=(f"Install package: {package}, Version: {version}, from Repository: {repository}")
     elif version:
-        message=(f"Installiere Paket: {package}, Version: {version}")
+        message=(f"Install package: {package}, Version: {version}")
     elif repository:
-        message=(f"Installiere Paket: {package} aus Repository: {repository}")
+        message=(f"Install package: {package} aus Repository: {repository}")
     else:
-        message=(f"Installiere Paket: {package}")
+        message=(f"Install package: {package}")
 
-    # Hier die Logik zum Installieren des Pakets implementieren
+    # logic to install packages
     print(message)
     return message
 
 def uninstall_package(package):
-    # Hier die Logik zum Deinstallieren eines Pakets implementieren
-    print(f"Deinstalliere Paket: {package}")
+    # logic to uninstall
+    print(f"Uninstall package: {package}")
 
 def update_package(package):
-    # Hier die Logik zum Aktualisieren eines Pakets implementieren
-    print(f"Aktualisiere Paket: {package}")
+    # logic to update
+    print(f"Update package: {package}")
 
 def version_package(package):
-    # Hier die Logik zum Anzeigen der Paketdetails implementieren
-    print(f"Details für Paket: {package}")
+    # logic to check version
+    print(f"Version of package: {package}")
 
 def register_package(package, version, repository, description=None):
-    # Hier die Logik zum Registrieren eines neuen Pakets implementieren
-    print(f"Registriere Paket: {package}, Version: {version}, aus Repository: {repository}, Beschreibung: {description}")
+    # logic to register a package
+    print(f"Register package: {package}, Version: {version}, from Repository: {repository}, Description: {description}")
     # Zum Beispiel: In einer Datenbank speichern oder in einer Datei ablegen
 
 def release_package(package, version, file_path, repository):
-    # Hier die Logik zum Hochladen eines Pakets implementieren
-    print(f"Lade Paket hoch: {package}, Version: {version}, Datei: {file_path}, in Repository: {repository}")
+    # logic to release
+    print(f"Release package: {package}, Version: {version}, File: {file_path}, to Repository: {repository}")
     # Datei an ein Repository oder einen Server hochladen
