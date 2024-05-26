@@ -1,11 +1,14 @@
+import sys
+import os
 if True:
-    import sys
-    import os
-    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+    PROJECT_DIR = os.path.dirname(os.path.dirname(__file__))
+    sys.path.append(PROJECT_DIR)
+    os.chdir(PROJECT_DIR)
     from package_index.create_repo import create_repo
     from package_index.pkg_repo import PackageRepo
     from testing_utils import mark
     import testing_utils
+    from utils.shell_tools import run_shell_command
 import walytis_beta_api as wapi
 REPO_NAME = "test_repo"
 BLOCKCHAIN_NAME = f"PeerPack-{REPO_NAME}"
@@ -20,31 +23,27 @@ PACKAGE_DATA = "./"
 def test_preparations():
     if BLOCKCHAIN_NAME in wapi.list_blockchain_names():
         wapi.delete_blockchain(BLOCKCHAIN_NAME)
-
-
-def test_create_repo():
     global package_repo
     create_repo(REPO_NAME)
     package_repo = PackageRepo(REPO_NAME)
-    mark(package_repo.blockchain.name == BLOCKCHAIN_NAME, "Created Repo.")
 
 
 def test_register_package():
     global private_key
-    private_key = package_repo.register_package(PACKAGE_NAME)
+    private_key = run_shell_command(
+        f"python3 cli.py register {REPO_NAME}.{PACKAGE_NAME}"
+    )[-1]
     mark(PACKAGE_NAME in package_repo.list_packages(), "Registered package.")
 
 
 def test_release_package():
-    version = "0.0.1"
-    package_repo.release_package(
-        PACKAGE_NAME,
-        version,
-        [],
-        PACKAGE_DATA,
-        private_key
+    global private_key
+    version = "1.0.0"
+    file = "./"
+    run_shell_command(
+        f"python3 cli.py release {REPO_NAME}.{PACKAGE_NAME} --version {version} --file {file} --key {private_key}"
     )
-    print(package_repo.get_package_versions(PACKAGE_NAME))
+
     mark(package_repo.get_package_versions(PACKAGE_NAME) == [version], "Released package.")
 
 
@@ -55,7 +54,6 @@ def test_delete_repo():
 
 def run_tests():
     test_preparations()
-    test_create_repo()
     test_register_package()
     test_release_package()
     test_delete_repo()

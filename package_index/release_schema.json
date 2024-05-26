@@ -11,6 +11,10 @@
       "type": "string",
       "description": "The version of this release of the package."
     },
+    "public_key": {
+      "type": "string",
+      "description": "The version of this release of the package."
+    },
     "ipfs_cid":{
       "type":"string",
       "description": "The IPFS content ID of the installable package data."

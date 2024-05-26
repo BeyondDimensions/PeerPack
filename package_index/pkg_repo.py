@@ -81,17 +81,20 @@ class PackageRepo:
         block_content = {
             "package_name": package_name,
             "version": version,
+            "dependencies": dependencies,
             "public_key": crypt.get_public_key(),
-            "package_data": ipfs_api.publish(package_data)
+            "ipfs_cid": ipfs_api.publish(package_data)
         }
 
         # sign data and append the signature
         signature = crypt.sign(json.dumps(block_content).encode())
         block_content.update({"signature": bytes_to_string(signature)})
 
+        validate(instance=block_content, schema=RELEASE_SCHEMA)
+
         self.blockchain.add_block(
             json.dumps(block_content).encode(),
-            topics=[REGISTER_TOPIC, package_name]
+            topics=[RELEASE_TOPIC, package_name]
         )
 
     def list_packages(self) -> list[str]:
@@ -175,8 +178,7 @@ class PackageRepo:
                     and package_name in wapi.decode_short_id(block_id)["topics"]
                     ):
                 try:
-                    release = self._read_release_block(
-                        self.blockchain.get_block(block_id))
+                    release = self._read_release_block(self.blockchain.get_block(block_id))
                     if self._verify_release(package_registration, release):
                         releases.append(release)
                 except Exception as error:
@@ -227,7 +229,8 @@ class PackageRepo:
             if not RELEASE_TOPIC in block.topics:
                 logger.warning("Release topic not in topics")
                 raise Exception()
-        except:
+        except Exception as error:
+            logger.error(error)
             raise InvalidBlockError()
         return registration_data
 
